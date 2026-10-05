@@ -184,7 +184,7 @@ body.intro-live .typ,body.intro-live .ad,body.intro-live .row i,body.intro-live 
 .bar{animation-duration:13.2s}
 .k.s{background:none;-webkit-text-fill-color:currentColor;color:#f6e4d0;animation:sc var(--t) var(--d) both;font:italic 400 clamp(28px,6.6vw,58px)/1.2 Georgia,"Times New Roman",serif;letter-spacing:-.01em;padding:0 26px}
 .k.s p{margin:0;max-width:15em}
-.k.s .w{display:inline-block;opacity:0;transform:translateY(16px);filter:blur(8px);animation:wd .8s calc(var(--d) + var(--i)*.17s) var(--e) forwards}
+.k.s .intro-word{display:inline-block;opacity:0;transform:translateY(16px);filter:blur(8px);animation:wd .8s calc(var(--d) + var(--i)*.17s) var(--e) forwards}
 .k.last.s{font:800 clamp(32px,7vw,68px)/1.05 var(--f);letter-spacing:-.04em;color:#fff;animation:sk 3.4s var(--d) both}
 .k.s b{color:var(--or);font-weight:inherit}
 .cut{position:absolute;left:50%;bottom:6%;width:min(52%,300px);height:3px;background:var(--or);border-radius:3px;transform:translateX(-50%) scaleX(0);animation:cut 1.2s 11.9s var(--e) forwards}
@@ -195,7 +195,7 @@ body.intro-live .typ,body.intro-live .ad,body.intro-live .row i,body.intro-live 
 </style>
 <style>
 .bar{animation-duration:19s}
-.k.s .w{filter:blur(4px);transform:translateY(10px);animation:wd .7s calc(var(--d) + var(--i)*.2s) var(--e) forwards}
+.k.s .intro-word{filter:blur(4px);transform:translateY(10px);animation:wd .7s calc(var(--d) + var(--i)*.2s) var(--e) forwards}
 .cut{animation-delay:17s}
 @keyframes sc{0%{opacity:0}8%{opacity:1}90%{opacity:1}100%{opacity:0}}
 </style>
@@ -220,16 +220,177 @@ header{transform:none}
   body.intro-live .typ,body.intro-live .ad,body.intro-live .row i,body.intro-live .bub{animation-play-state:running}
 }
 </style>
+
+<style id="savvana-correcoes-finais">
+:root{--or:#ff5a1f;--or2:#e74710}
+
+/* LOGO OFICIAL: wordmark savvana. — sem o ícone inventado */
+.logo{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:0!important;
+  font-family:"DM Sans","Segoe UI",Arial,sans-serif!important;
+  font-size:30px!important;
+  font-weight:800!important;
+  letter-spacing:-.075em!important;
+  line-height:1!important;
+  color:#171717!important;
+}
+.logo svg{display:none!important}
+.logo b{font:inherit!important;color:#171717!important}
+.logo i{
+  font:inherit!important;
+  font-style:normal!important;
+  color:#171717!important;
+}
+.logo i::after{
+  content:".";
+  color:#ff5a1f;
+  margin-left:.015em;
+}
+
+/* Laranja mais vivo */
+.or{color:#ff5a1f!important}
+.btn{background:#ff5a1f!important;box-shadow:0 14px 30px -10px rgba(255,90,31,.68)!important}
+.btn:hover{background:#e74710!important}
+#intro .bar{background:#ff5a1f!important}
+#intro .blob{background:radial-gradient(circle,#ff9b68,#ff5a1f 55%,transparent 72%)!important}
+.k.last b{color:#ff5a1f!important}
+
+/* CORREÇÃO DA INTRO NO MOBILE SEM ALTERAR UMA PALAVRA DO TEXTO */
+@media(max-width:700px){
+  #intro .stage{
+    width:calc(100vw - 34px)!important;
+    max-width:620px!important;
+    height:54dvh!important;
+  }
+  #intro .k{
+    width:100%!important;
+    max-width:100%!important;
+    padding:0 2px!important;
+  }
+  #intro .k p{
+    width:100%!important;
+    max-width:100%!important;
+    margin:0 auto!important;
+    padding:0!important;
+    font-size:clamp(27px,8vw,42px)!important;
+    line-height:1.09!important;
+    letter-spacing:-.04em!important;
+    text-wrap:balance!important;
+    overflow-wrap:normal!important;
+    word-break:normal!important;
+  }
+  #intro .k .intro-word{
+    width:auto!important;
+    display:inline-block!important;
+    margin:0!important;
+  }
+  #intro .k.last p{font-size:clamp(28px,8.2vw,43px)!important}
+}
+footer .cnpj{display:block;margin-top:5px;font-size:12px;color:#b6aaa0}
+</style>
+
+
+<style id="savvana-intro-1080p-fix">
+/*
+  FIX DEFINITIVO DA INTRO:
+  .w é a classe global de container do site. Os spans da intro agora usam
+  .intro-word, evitando que cada palavra receba ~1180px de largura.
+*/
+#intro .intro-word{
+  display:inline-block!important;
+  width:auto!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0!important;
+  white-space:nowrap!important;
+}
+
+#intro .stage{
+  width:min(calc(100vw - 96px),1280px)!important;
+  height:min(56vh,560px)!important;
+}
+
+#intro .k.s{
+  width:100%!important;
+  padding-inline:32px!important;
+}
+
+#intro .k.s p{
+  width:auto!important;
+  max-width:min(92vw,1080px)!important;
+  margin:0 auto!important;
+  text-align:center!important;
+  text-wrap:balance!important;
+  overflow-wrap:normal!important;
+  word-break:normal!important;
+}
+
+/* Desktop Full HD / 1080p */
+@media (min-width:1200px) and (min-height:700px){
+  #intro .stage{
+    width:min(calc(100vw - 160px),1360px)!important;
+    height:560px!important;
+  }
+  #intro .k.s{
+    font-size:clamp(48px,3.25vw,64px)!important;
+    line-height:1.14!important;
+    padding-inline:48px!important;
+  }
+  #intro .k.s p{
+    max-width:1120px!important;
+  }
+  #intro .k.last.s{
+    font-size:clamp(48px,3.6vw,70px)!important;
+    line-height:1.06!important;
+  }
+}
+
+/* Notebook / tablet landscape */
+@media (min-width:701px) and (max-width:1199px){
+  #intro .stage{
+    width:calc(100vw - 64px)!important;
+    height:52vh!important;
+  }
+  #intro .k.s{
+    font-size:clamp(36px,4.6vw,54px)!important;
+    padding-inline:20px!important;
+  }
+  #intro .k.s p{max-width:900px!important}
+}
+
+/* Mobile: mantém palavras agrupadas e nunca deixa a frase sair da tela */
+@media (max-width:700px){
+  #intro .stage{
+    width:calc(100vw - 28px)!important;
+    height:58dvh!important;
+  }
+  #intro .k.s{
+    padding-inline:4px!important;
+    font-size:clamp(28px,8.2vw,42px)!important;
+    line-height:1.1!important;
+  }
+  #intro .k.s p{
+    width:100%!important;
+    max-width:100%!important;
+  }
+  #intro .k.last.s{
+    font-size:clamp(30px,8.4vw,44px)!important;
+  }
+}
+</style>
+
 </head>
 <body class="ready intro-live">
 
 <div id="intro" aria-hidden="true">
   <div class="blob b1"></div><div class="blob b2"></div>
   <div class="stage">
-    <div class="k s" style="--d:.3s;--t:5s"><p><span class="w" style="--i:0">Você</span> <span class="w" style="--i:1">passou</span> <span class="w" style="--i:2">anos</span> <span class="w" style="--i:3">transformando</span> <span class="w" style="--i:4">madeira</span> <span class="w" style="--i:5">em</span> <span class="w" style="--i:6">lar.</span></p></div>
-    <div class="k s" style="--d:5.4s;--t:3.8s"><p><span class="w" style="--i:0">Mas</span> <span class="w" style="--i:1">o</span> <span class="w" style="--i:2">telefone</span> <span class="w" style="--i:3">anda</span> <span class="w" style="--i:4">quieto.</span></p></div>
-    <div class="k s" style="--d:9.3s;--t:5.6s"><p><span class="w" style="--i:0">Enquanto</span> <span class="w" style="--i:1">isso,</span> <span class="w" style="--i:2">alguém</span> <span class="w" style="--i:3">procura</span> <span class="w" style="--i:4">agora</span> <span class="w" style="--i:5">o</span> <span class="w" style="--i:6">que</span> <span class="w" style="--i:7">só</span> <span class="w" style="--i:8">você</span> <span class="w" style="--i:9">sabe</span> <span class="w" style="--i:10">fazer.</span></p></div>
-    <div class="k s last" style="--d:15s;"><p><span class="w" style="--i:0">Vamos</span> <span class="w" style="--i:1">fazer</span> <span class="w" style="--i:2">essa</span> <span class="w" style="--i:3">pessoa</span> <b><span class="w" style="--i:4">chegar</span> <span class="w" style="--i:5">até</span> <span class="w" style="--i:6">você.</span></b></p></div>
+    <div class="k s" style="--d:.3s;--t:5s"><p><span class="intro-word" style="--i:0">Você</span> <span class="intro-word" style="--i:1">passou</span> <span class="intro-word" style="--i:2">anos</span> <span class="intro-word" style="--i:3">transformando</span> <span class="intro-word" style="--i:4">madeira</span> <span class="intro-word" style="--i:5">em</span> <span class="intro-word" style="--i:6">lar.</span></p></div>
+    <div class="k s" style="--d:5.4s;--t:3.8s"><p><span class="intro-word" style="--i:0">Mas</span> <span class="intro-word" style="--i:1">o</span> <span class="intro-word" style="--i:2">telefone</span> <span class="intro-word" style="--i:3">anda</span> <span class="intro-word" style="--i:4">quieto.</span></p></div>
+    <div class="k s" style="--d:9.3s;--t:5.6s"><p><span class="intro-word" style="--i:0">Enquanto</span> <span class="intro-word" style="--i:1">isso,</span> <span class="intro-word" style="--i:2">alguém</span> <span class="intro-word" style="--i:3">procura</span> <span class="intro-word" style="--i:4">agora</span> <span class="intro-word" style="--i:5">o</span> <span class="intro-word" style="--i:6">que</span> <span class="intro-word" style="--i:7">só</span> <span class="intro-word" style="--i:8">você</span> <span class="intro-word" style="--i:9">sabe</span> <span class="intro-word" style="--i:10">fazer.</span></p></div>
+    <div class="k s last" style="--d:15s;"><p><span class="intro-word" style="--i:0">Vamos</span> <span class="intro-word" style="--i:1">fazer</span> <span class="intro-word" style="--i:2">essa</span> <span class="intro-word" style="--i:3">pessoa</span> <b><span class="intro-word" style="--i:4">chegar</span> <span class="intro-word" style="--i:5">até</span> <span class="intro-word" style="--i:6">você.</span></b></p></div>
     <div class="cut"></div>
   </div>
   <div class="bar"></div>
@@ -238,7 +399,7 @@ header{transform:none}
 
 <header>
   <div class="w hd">
-    <a class="logo" href="#topo" aria-label="Savvana"><svg viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#f16f39"/><path d="M42 20c-4-6-20-6-20 3 0 10 23 3 23 15 0 11-23 14-29 3" fill="none" stroke="#fffaf4" stroke-width="6" stroke-linecap="round"/></svg><b>savvan<i>a</i></b></a>
+    <a class="logo" href="#topo" aria-label="Savvana"><b>savvan<i>a</i></b></a>
     <a class="btn wa" href="#" data-src="header">Quero uma proposta</a>
   </div>
 </header>
@@ -348,7 +509,7 @@ header{transform:none}
 </section>
 </main>
 
-<footer><div class="w">© <span id="yr"></span> Savvana · Sites e tráfego pago para negócios de serviços</div></footer>
+<footer><div class="w">© <span id="yr"></span> Savvana · Sites e tráfego pago para negócios de serviços<span class="cnpj">CNPJ 58.232.552/0001-05</span></div></footer>
 
 <a class="btn pulse fab wa" href="#" data-src="fab" aria-label="Chamar a Savvana no WhatsApp">
   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2z"/></svg>Quero uma proposta
