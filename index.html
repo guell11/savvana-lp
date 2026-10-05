@@ -619,7 +619,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #b9
      ========================================================= -->
 <script>
 window.SAVVANA_TRACKING_CONFIG = {
-  metaPixelId: "",
+  metaPixelId: "1783028056283077",
   googleAdsId: "",
   googleAdsConversionLabel: "",
   requireConsent: true
@@ -754,7 +754,7 @@ window.SAVVANA_TRACKING_CONFIG = {
           value('lead-message') ? '• Objetivo: ' + value('lead-message') : ''
         ].filter(Boolean);
         const whatsappUrl='https://wa.me/5511914930743?text=' + encodeURIComponent(lines.join('\n'));
-        const tracked=window.SavvanaTracking && window.SavvanaTracking.trackLead('form_submit');
+        const tracked=window.SavvanaTracking && window.SavvanaTracking.trackWhatsAppIntent('form_submit', form, event);
         window.setTimeout(()=>window.location.assign(whatsappUrl), tracked ? 220 : 0);
       });
 
@@ -771,151 +771,174 @@ window.SAVVANA_TRACKING_CONFIG = {
 <script id="savvana-tracking-manager">
 (function(){
   'use strict';
+  const managerKey='__SAVVANA_TRACKING_MANAGER_INITIALIZED__';
+  if (window[managerKey]) return;
+  window[managerKey]=true;
+
   const cfg = Object.assign({
     metaPixelId:'',
     googleAdsId:'',
     googleAdsConversionLabel:'',
     requireConsent:true
   }, window.SAVVANA_TRACKING_CONFIG || {});
+  const pixelId=String(cfg.metaPixelId || '').trim();
+  const metaOk=/^\d{5,}$/.test(pixelId);
+  const storageKey='savvana_tracking_consent_v1';
+  const allowedSources=new Set(['whatsapp_click','form_submit']);
+  const recentActions=new WeakMap();
+  const handledClickEvents=new WeakSet();
+  const duplicateWindowMs=750;
+  let active=false;
+  let metaLoaded=false;
+  let readyHandled=false;
+  let consentDecision='pending';
 
-  const metaOk = /^\d{5,}$/.test(String(cfg.metaPixelId || '').trim());
-  const googleId = String(cfg.googleAdsId || '').trim();
-  const googleOk = /^AW-\d+$/.test(googleId);
-  const hasTracking = metaOk || googleOk;
-  let active = false;
-  let metaLoaded = false;
-  let googleLoaded = false;
-
-  window.dataLayer = window.dataLayer || [];
-  window.gtag = window.gtag || function(){ window.dataLayer.push(arguments); };
-  window.gtag('consent','default',{
-    ad_storage:'denied',
-    analytics_storage:'denied',
-    ad_user_data:'denied',
-    ad_personalization:'denied',
-    wait_for_update:500
-  });
-
-  function injectScript(src, id){
-    if (id && document.getElementById(id)) return;
-    const s=document.createElement('script');
-    s.async=true;
-    s.src=src;
-    if(id) s.id=id;
-    document.head.appendChild(s);
+  function injectMetaScript(){
+    if (document.getElementById('savvana-meta-pixel')) return true;
+    try {
+      const script=document.createElement('script');
+      script.async=true;
+      script.id='savvana-meta-pixel';
+      script.src='https://connect.facebook.net/en_US/fbevents.js';
+      document.head.appendChild(script);
+      return true;
+    } catch(e) {
+      return false;
+    }
   }
 
-  function loadGoogle(){
-    if (!googleOk || googleLoaded) return;
-    googleLoaded = true;
-    injectScript('https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(googleId), 'savvana-google-ads');
-    window.gtag('js', new Date());
-    window.gtag('config', googleId);
+  function ensureFbq(){
+    if (typeof window.fbq !== 'function') {
+      const fbq=function(){
+        if (fbq.callMethod) fbq.callMethod.apply(fbq,arguments);
+        else fbq.queue.push(arguments);
+      };
+      fbq.push=fbq;
+      fbq.loaded=true;
+      fbq.version='2.0';
+      fbq.queue=[];
+      window.fbq=fbq;
+      if (!window._fbq) window._fbq=fbq;
+      injectMetaScript();
+    }
+    return typeof window.fbq === 'function';
   }
 
   function loadMeta(){
     if (!metaOk || metaLoaded) return;
-    metaLoaded = true;
-    if (!window.fbq) {
-      const fbq = window.fbq = function(){ fbq.callMethod ? fbq.callMethod.apply(fbq,arguments) : fbq.queue.push(arguments); };
-      if (!window._fbq) window._fbq = fbq;
-      fbq.push = fbq;
-      fbq.loaded = true;
-      fbq.version = '2.0';
-      fbq.queue = [];
-      injectScript('https://connect.facebook.net/en_US/fbevents.js', 'savvana-meta-pixel');
+    metaLoaded=true;
+    try {
+      if (!ensureFbq()) return;
+      window.fbq('set','autoConfig',false,pixelId);
+      window.fbq('init',pixelId);
+      if (!window.__SAVVANA_META_PAGEVIEW_SENT__) {
+        window.__SAVVANA_META_PAGEVIEW_SENT__=true;
+        window.fbq('track','PageView');
+      }
+    } catch(e) {
+      // Pixel failures must never interrupt the WhatsApp path.
     }
-    window.fbq('init', String(cfg.metaPixelId).trim());
-    window.fbq('track', 'PageView');
   }
 
   function grant(){
-    active = true;
-    window.gtag('consent','update',{
-      ad_storage:'granted',
-      analytics_storage:'granted',
-      ad_user_data:'granted',
-      ad_personalization:'granted'
-    });
-    loadGoogle();
+    if (!metaOk || consentDecision === 'denied') return false;
+    active=true;
+    consentDecision='granted';
     loadMeta();
+    return true;
   }
 
   function deny(){
-    active = false;
-    window.gtag('consent','update',{
-      ad_storage:'denied',
-      analytics_storage:'denied',
-      ad_user_data:'denied',
-      ad_personalization:'denied'
-    });
+    active=false;
+    consentDecision='denied';
   }
 
-  function trackLead(source){
-    if (!active) return false;
-    const method = source || 'site';
-    if (googleOk) {
-      window.gtag('event','generate_lead',{send_to:googleId,method:method});
-      const label=String(cfg.googleAdsConversionLabel || '').trim();
-      if(label) window.gtag('event','conversion',{send_to:googleId + '/' + label});
+  function isDuplicate(target){
+    const now=Date.now();
+    const previous=recentActions.get(target);
+    if (previous !== undefined && now-previous < duplicateWindowMs) return true;
+    recentActions.set(target,now);
+    return false;
+  }
+
+  function trackWhatsAppIntent(source,target,event){
+    if (!active || !metaOk || typeof window.fbq !== 'function') return false;
+    if (!allowedSources.has(source)) return false;
+    if (source === 'form_submit') {
+      const form=document.getElementById('briefing-form');
+      if (!event || event.isTrusted !== true || event.type !== 'submit' || target !== form || event.currentTarget !== form) return false;
+      try {
+        if (typeof form.checkValidity !== 'function' || !form.checkValidity()) return false;
+      } catch(e) {
+        return false;
+      }
+    } else if (!event || event.isTrusted !== true || event.type !== 'click' || event.button !== 0 || event.defaultPrevented || target !== event.currentTarget || !isWhatsAppLink(target)) {
+      return false;
     }
-    if(metaOk && window.fbq) window.fbq('track','Lead',{content_name:method});
-    return true;
+    if (isDuplicate(target)) return true;
+    try {
+      window.fbq('trackCustom','WhatsAppClick',{source:source});
+      return true;
+    } catch(e) {
+      return false;
+    }
   }
 
-  function trackPortfolio(name){
-    if (!active) return false;
-    const project = name || 'Projeto';
-    if (googleOk) window.gtag('event','portfolio_click',{send_to:googleId,project_name:project});
-    if (metaOk && window.fbq) window.fbq('trackCustom','PortfolioClick',{project_name:project});
-    return true;
+  function isWhatsAppLink(link){
+    try {
+      const url=new URL(link.href || link.getAttribute('href'),window.location.href);
+      return url.protocol === 'https:' && url.hostname.toLowerCase() === 'wa.me';
+    } catch(e) {
+      return false;
+    }
   }
 
-  window.SavvanaTracking = {
-    trackLead:trackLead,
-    trackPortfolio:trackPortfolio,
+  function handleWhatsAppClick(event){
+    if (!event || event.isTrusted !== true || event.defaultPrevented || event.button !== 0) return;
+    if (handledClickEvents.has(event)) return;
+    handledClickEvents.add(event);
+    const link=event.currentTarget;
+    trackWhatsAppIntent('whatsapp_click',link,event);
+  }
+
+  window.SavvanaTracking={
+    trackWhatsAppIntent:trackWhatsAppIntent,
     isActive:function(){return active;},
-    hasTracking:hasTracking
+    hasTracking:metaOk
   };
 
-  document.addEventListener('DOMContentLoaded', function(){
-    if (!hasTracking) return;
+  document.addEventListener('DOMContentLoaded',function(){
+    if (readyHandled) return;
+    readyHandled=true;
+    if (!metaOk) return;
+
     const banner=document.getElementById('tracking-consent');
     const accept=document.getElementById('tracking-consent-accept');
     const reject=document.getElementById('tracking-consent-reject');
-    const storageKey='savvana_tracking_consent_v1';
     let saved='';
-    try{ saved=localStorage.getItem(storageKey) || ''; }catch(e){}
+    try { saved=window.localStorage.getItem(storageKey) || ''; } catch(e) {}
 
-    if (!cfg.requireConsent) {
-      grant();
-    } else if (saved === 'granted') {
+    if (!cfg.requireConsent || saved === 'granted') {
       grant();
     } else if (saved === 'denied') {
       deny();
     } else if (banner) {
       banner.hidden=false;
+      if (accept) accept.addEventListener('click',function(){
+        if (consentDecision !== 'pending') return;
+        try { window.localStorage.setItem(storageKey,'granted'); } catch(e) {}
+        if (grant()) banner.hidden=true;
+      });
+      if (reject) reject.addEventListener('click',function(){
+        if (consentDecision !== 'pending') return;
+        try { window.localStorage.setItem(storageKey,'denied'); } catch(e) {}
+        deny();
+        banner.hidden=true;
+      });
     }
 
-    if (accept) accept.addEventListener('click', function(){
-      try{localStorage.setItem(storageKey,'granted')}catch(e){}
-      grant();
-      if(banner) banner.hidden=true;
-    });
-    if (reject) reject.addEventListener('click', function(){
-      try{localStorage.setItem(storageKey,'denied')}catch(e){}
-      deny();
-      if(banner) banner.hidden=true;
-    });
-
     document.querySelectorAll('a[href*="wa.me/"]').forEach(function(link){
-      link.addEventListener('click', function(){ trackLead('whatsapp_click'); });
-    });
-    document.querySelectorAll('.project-card').forEach(function(card){
-      card.addEventListener('click', function(){
-        const title=card.querySelector('h3');
-        trackPortfolio(title ? title.textContent.trim() : 'Projeto');
-      });
+      link.addEventListener('click',handleWhatsAppClick);
     });
   });
 })();
