@@ -762,10 +762,10 @@ window.SAVVANA_TRACKING_CONFIG = {
   </script>
 <script>document.addEventListener('DOMContentLoaded',()=>{const rail=document.getElementById('mobile-contact-rail');const targets=['projetos','contato'].map(id=>document.getElementById(id)).concat([document.querySelector('.last-cta'),document.querySelector('.footer')]).filter(Boolean);if(rail&&targets.length&&'IntersectionObserver'in window){const visible=new Map(targets.map(el=>[el,false]));const io=new IntersectionObserver(es=>{for(const e of es)visible.set(e.target,e.isIntersecting);rail.classList.toggle('near-contact',[...visible.values()].some(Boolean))},{rootMargin:'0px 0px -8% 0px'});targets.forEach(el=>io.observe(el))}});</script>
 <div class="tracking-consent" id="tracking-consent" role="dialog" aria-label="Preferências de cookies" aria-live="polite" hidden>
-  <p><strong>Medição e anúncios.</strong> Com sua permissão, usamos Meta Pixel e Google Ads para medir visitas e pedidos de contato. Sem consentimento, esses scripts não são carregados.</p>
+  <p>Usamos cookies para medir visitas e melhorar sua experiência.</p>
   <div class="tracking-consent-actions">
     <button id="tracking-consent-reject" type="button">Somente necessários</button>
-    <button class="tracking-consent-accept" id="tracking-consent-accept" type="button">Aceitar medição</button>
+    <button class="tracking-consent-accept" id="tracking-consent-accept" type="button">Aceitar cookies</button>
   </div>
 </div>
 <script id="savvana-tracking-manager">
