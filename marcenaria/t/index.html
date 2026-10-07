@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700;9..40,800&display=swap">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"ProfessionalService","name":"Savvana","description":"Landing pages e tráfego pago para marcenarias","telephone":"+5511914930743","areaServed":"BR"},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Preciso ter site para começar?","acceptedAnswer":{"@type":"Answer","text":"Não. Criamos a landing page da campanha e ela já nasce pronta para receber orçamentos."}},{"@type":"Question","name":"O valor dos anúncios está incluso?","acceptedAnswer":{"@type":"Answer","text":"Não. O investimento em anúncios vai direto para o Google, separado do nosso serviço, e você acompanha cada real."}},{"@type":"Question","name":"Vocês prometem quantidade de orçamentos?","acceptedAnswer":{"@type":"Answer","text":"Não prometemos número. Mostramos o que cada real gerou em contatos e ajustamos a campanha todo mês."}}]}]}</script>
-<!-- GOOGLE ADS: cole aqui a tag gtag.js da sua conta (AW-XXXXXXXXX) -->
+
 <style>
 :root{--ink:#28231f;--ink2:#35302b;--paper:#fffaf4;--paper2:#f8f3ed;--or:#e96937;--or2:#c94a20;--line:#e7ded4;--mut:#736b63;--e:cubic-bezier(.22,1,.36,1);--f:"DM Sans","Segoe UI",Arial,sans-serif}
 *,*::before,*::after{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:84px}
@@ -292,6 +292,8 @@ footer .cnpj{display:block;margin-top:5px;font-size:12px;color:#b6aaa0}
 </style>
 
 <style>#intro{display:none!important}</style>
+<link rel="stylesheet" href="/assets/savvana-consent.css">
+<script src="/assets/savvana-consent.js"></script>
 </head>
 <body class="ready">
 
@@ -407,7 +409,13 @@ footer .cnpj{display:block;margin-top:5px;font-size:12px;color:#b6aaa0}
 </section>
 </main>
 
-<footer><div class="w">© <span id="yr"></span> Savvana · Sites e tráfego pago para negócios de serviços<span class="cnpj">CNPJ 58.232.552/0001-05</span></div></footer>
+<footer><div class="w">
+  <div>© <span id="yr"></span> Savvana · Sites e tráfego pago para negócios de serviços</div>
+  <div class="savvana-footer-legal">
+    <span class="savvana-cnpj">CNPJ 58.232.552/0001-05</span>
+    <nav class="savvana-footer-links" aria-label="Informações legais"><a href="/politica-de-privacidade/">Política de privacidade</a><a href="/termos-de-uso/">Termos de uso</a><button type="button" data-open-consent>Preferências de cookies</button></nav>
+  </div>
+</div></footer>
 
 <a class="btn pulse fab wa" href="#" data-src="fab" aria-label="Chamar a Savvana no WhatsApp">
   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2z"/></svg>Quero uma proposta
@@ -498,13 +506,6 @@ footer .cnpj{display:block;margin-top:5px;font-size:12px;color:#b6aaa0}
     return "https://wa.me/"+WHATS+"?text="+encodeURIComponent(t||MSG);
   }
 
-  function track(s){
-    try{
-      window.dataLayer=window.dataLayer||[];
-      window.dataLayer.push({event:"whatsapp_click",origem:s});
-    }catch(e){}
-  }
-
   try{
     var wa=d.querySelectorAll(".wa");
     for(var i=0;i<wa.length;i++){
@@ -512,7 +513,6 @@ footer .cnpj{display:block;margin-top:5px;font-size:12px;color:#b6aaa0}
         a.href=url();
         a.target="_blank";
         a.rel="noopener noreferrer";
-        a.addEventListener("click",function(){track(a.getAttribute("data-src"));},false);
       })(wa[i]);
     }
   }catch(e){}
@@ -527,14 +527,13 @@ footer .cnpj{display:block;margin-top:5px;font-size:12px;color:#b6aaa0}
           if(n){n.focus();n.style.borderColor="#d93025";}
           return false;
         }
-        track("form");
         var mc=d.getElementById("mc");
         var iv=d.getElementById("iv");
         var text="Olá, Savvana! Sou "+n.value.trim()+" ("+((mc&&mc.value.trim())||"minha marcenaria")+"). Investimento em anúncios: "+((iv&&iv.value)||"Ainda não sei")+". Quero uma proposta.";
         var destination=url(text);
 
         /* location.href funciona melhor que window.open em WebViews/mobile com bloqueio de pop-up. */
-        try{window.location.href=destination;}catch(err){window.open(destination,"_blank");}
+        if(window.SavvanaTracking&&typeof window.SavvanaTracking.openWhatsAppAfterConversion==="function"){window.SavvanaTracking.openWhatsAppAfterConversion("form_submit",form,e,destination);}else{window.location.assign(destination);}
         return false;
       },false);
     }
@@ -569,5 +568,29 @@ footer .cnpj{display:block;margin-top:5px;font-size:12px;color:#b6aaa0}
   }catch(e){}
 })();
 </script>
-</body>
+<div class="savvana-consent-banner" id="savvana-consent-banner" role="region" aria-label="Preferências de privacidade" hidden>
+  <div>
+    <p class="savvana-consent-copy"><strong>Você escolhe o uso de publicidade.</strong>Armazenamos sua decisão neste navegador. Google Ads e, na página principal, Meta Pixel só carregam após sua autorização.</p>
+    <nav class="savvana-consent-links" aria-label="Documentos legais"><a href="/politica-de-privacidade/">Política de privacidade</a><a href="/termos-de-uso/">Termos de uso</a></nav>
+  </div>
+  <div class="savvana-consent-actions">
+    <button type="button" id="savvana-consent-reject">Recusar</button>
+    <button type="button" id="savvana-consent-open">Preferências</button>
+    <button type="button" id="savvana-consent-accept" class="savvana-consent-primary">Aceitar</button>
+  </div>
+</div>
+<dialog class="savvana-consent-dialog" id="savvana-consent-preferences" aria-labelledby="savvana-consent-title">
+  <div class="savvana-consent-dialog-inner">
+    <h2 id="savvana-consent-title">Preferências de privacidade</h2>
+    <p>O armazenamento necessário guarda sua escolha. Medição e publicidade ficam desativadas até você autorizar.</p>
+    <label class="savvana-consent-option">
+      <input type="checkbox" id="savvana-ads-consent">
+      <span><strong>Medição e publicidade</strong><span>Permite carregar Google Ads e, na página principal, Meta Pixel para medir contatos.</span></span>
+    </label>
+    <div class="savvana-consent-dialog-actions">
+      <button type="button" id="savvana-consent-close">Voltar</button>
+      <button type="button" id="savvana-consent-save" class="savvana-consent-primary">Salvar escolha</button>
+    </div>
+  </div>
+</dialog></body>
 </html>
